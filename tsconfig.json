@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "es2016",
+        "esModuleInterop": false,
+        "skipLibCheck": true,
+        "strict": true,
+        "outDir": "./build"
+    }
+}
