@@ -191,7 +191,7 @@ export class ExpressLogger {
     routePrefix: string;
     ipPrefix: string;
 
-    constructor(req: any, res: any) {
+    constructor(req: any) {
         const method = (req.method as string).toUpperCase();
         const route = req.baseUrl || req.path || "/";
 

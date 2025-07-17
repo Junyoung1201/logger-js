@@ -41,19 +41,39 @@ Logger.pauseWriteLogFile(false);  // 재개
 Logger.stopWriteLogFile();
 ```
 
+## ⌨️ ExpressLogger 사용 예시
+```
+app.get("/route/v1", (req, res) => {
+    const logger = new ExpressLogger(req);
+
+    logger.info("이건 일반 메세지");
+    // -> 예시 출력: [2025-07-18 07:24:49] [INFO] [GET /route/endpoint_1] [IP: ::1] 이건 일반 메세지
+
+    logger.warn("이건 경고 메세지");
+    // -> 예시 출력: [2025-07-18 07:24:49] [WARN] [GET /route/endpoint_1] [IP: ::1] 이건 경고 메세지
+
+    logger.error("이건 오류 메세지");
+    // -> 예시 출력: [2025-07-18 07:24:49] [ERROR] [GET /route/endpoint_1] [IP: ::1] 이건 오류 메세지
+
+    logger.info("GET 요청:",req.query);
+    // -> 예시 출력: [2025-07-18 07:24:49] [INFO] [GET /route/endpoint_1] [IP: ::1] GET 요청: {}
+
+    res.send(`hello world`);
+});
+```
+
 ## 🛠️ 레퍼런스
 |메서드|설명|
 | --- | --- |
-|`ensureDir(dirPath)`| 경로가 없으면 재귀적으로 생성
-|`startWriteLogFile(fileOrDir?)`|로그 기록 스트림 오픈<br/>- `fileOrDir`가 **폴더**일 경우: 해당 폴더 + 자동 파일명<br/>- `fileOrDir`가 \***.log** 파일일 경우: 지정 파일 사용|
-|`stopWriteLogFile()`| 스트림 flush 후 닫기|
-| `pauseWriteLogFile(bool)`| `true` → 기록 일시 중지, `false` → 재개|
-|`setLogSaveDir(dir)`| 로그 저장 폴더 변경 (즉시 재오픈)|
-| `setLogFile(file)`| 로그 파일명 변경 (즉시 재오픈)|
-| `setSilent(bool)`| 내부 진단 메시지(`Logger.s`) 출력 여부|
-|`getLogSaveDir()`| 현재 로그 저장 폴더 반환|
-| `getLogFileFullPath()`| 실제 사용 중인 파일의 절대 경로|
-| `info(message)`| `[INFO]` 레벨 기록|
-| `warn(message)`| `[WARN]` 레벨 기록|
-| `error(message)`| `[ERROR]` 레벨 기록|
-| `obj2str(value)`| 객체·에러를 사람이 읽기 좋은 문자열로 변환 (순환 참조 안전)|
+|`Logger.startWriteLogFile(fileOrDir?)`|로그 기록 스트림 오픈<br/>- `fileOrDir`가 **폴더**일 경우: 해당 폴더 + 자동 파일명<br/>- `fileOrDir`가 **.log** 파일일 경우: 지정 파일 사용|
+|`Logger.stopWriteLogFile()`| 스트림 flush 후 닫기|
+|`Logger.pauseWriteLogFile(bool)`| `true` → 기록 일시 중지, `false` → 재개|
+|`Logger.setLogSaveDir(dir)`| 로그 저장 폴더 변경 (즉시 스트림이 다시 열림)|
+|`Logger.setLogFile(file)`| 로그 파일명 변경 (즉시 스트림이 다시 열림)|
+|`Logger.setSilent(bool)`| 디버그 메세지 출력 여부|
+|`Logger.getLogSaveDir()`| 현재 로그 저장 폴더 반환|
+|`Logger.getLogFileFullPath()`| 실제 사용 중인 파일의 절대 경로|
+|`Logger.info(message)`| `[INFO]` 레벨 기록|
+|`Logger.warn(message)`| `[WARN]` 레벨 기록|
+|`Logger.error(message)`| `[ERROR]` 레벨 기록|
+|`Logger.obj2str(value)`| 객체·에러를 사람이 읽기 좋은 문자열로 변환 (순환 참조 안전)|
