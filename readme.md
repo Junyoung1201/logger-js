@@ -47,16 +47,16 @@ app.get("/route/v1", (req, res) => {
     const logger = new ExpressLogger(req);
 
     logger.info("이건 일반 메세지");
-    // -> 예시 출력: [2025-07-18 07:24:49] [INFO] [GET /route/endpoint_1] [IP: ::1] 이건 일반 메세지
+    // -> 예시 출력: [2025-07-18 07:24:49] [INFO] [GET /route/v1] [IP: ::1] 이건 일반 메세지
 
     logger.warn("이건 경고 메세지");
-    // -> 예시 출력: [2025-07-18 07:24:49] [WARN] [GET /route/endpoint_1] [IP: ::1] 이건 경고 메세지
+    // -> 예시 출력: [2025-07-18 07:24:49] [WARN] [GET /route/v1] [IP: ::1] 이건 경고 메세지
 
     logger.error("이건 오류 메세지");
-    // -> 예시 출력: [2025-07-18 07:24:49] [ERROR] [GET /route/endpoint_1] [IP: ::1] 이건 오류 메세지
+    // -> 예시 출력: [2025-07-18 07:24:49] [ERROR] [GET /route/v1] [IP: ::1] 이건 오류 메세지
 
     logger.info("GET 요청:",req.query);
-    // -> 예시 출력: [2025-07-18 07:24:49] [INFO] [GET /route/endpoint_1] [IP: ::1] GET 요청: {}
+    // -> 예시 출력: [2025-07-18 07:24:49] [INFO] [GET /route/v1] [IP: ::1] GET 요청: {}
 
     res.send(`hello world`);
 });
