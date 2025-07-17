@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Logger = void 0;
+exports.ExpressLogger = exports.Logger = void 0;
 exports.ensureDir = ensureDir;
 var fs_1 = require("fs");
 var path = require("path");
@@ -159,13 +159,14 @@ var Logger = /** @class */ (function () {
         }
     };
     Logger.stopWriteLogFile = function () {
-        Logger.s("Stop writing log file.");
-        if (Logger.ws) {
-            Logger.s("A write stream of log files currently exists. Ends the write stream of a log file.");
-            Logger.ws.close();
-            Logger.ws.end();
-            Logger.ws = undefined;
+        if (!Logger.ws) {
+            return;
         }
+        Logger.s("Stop writing log file.");
+        Logger.s("A write stream of log files currently exists. Ends the write stream of a log file.");
+        Logger.ws.close();
+        Logger.ws.end();
+        Logger.ws = undefined;
     };
     Logger.pauseWriteLogFile = function (bool) {
         Logger.paused = bool;
@@ -196,14 +197,14 @@ var Logger = /** @class */ (function () {
             Logger.startWriteLogFile();
         }
     };
-    Logger.info = function (message) {
-        Logger.log('info', message);
-    };
     Logger.log = function (level, message) {
         var _a = Logger.getTimeStr(new Date()), yyyy = _a.yyyy, mm = _a.mm, dd = _a.dd, h = _a.h, m = _a.m, s = _a.s;
         var text = "[".concat(yyyy, "-").concat(mm, "-").concat(dd, " ").concat(h, ":").concat(m, ":").concat(s, "] [").concat(level.toUpperCase(), "] ").concat(message);
         console[level](text);
         Logger.writeLogFile(text);
+    };
+    Logger.info = function (message) {
+        Logger.log('info', message);
     };
     Logger.warn = function (message) {
         Logger.log('warn', message);
@@ -219,6 +220,33 @@ var Logger = /** @class */ (function () {
     return Logger;
 }());
 exports.Logger = Logger;
+var ExpressLogger = /** @class */ (function () {
+    function ExpressLogger(req, res) {
+        var method = req.method.toUpperCase();
+        var route = req.baseUrl || req.path || "/";
+        this.routePrefix = "[".concat(method, " ").concat(route, "]");
+        this.ipPrefix = "[IP: ".concat(req.ip, "]");
+    }
+    ExpressLogger.prototype.formatMessage = function (message, obj) {
+        var fullMessage = "".concat(this.routePrefix, " ").concat(this.ipPrefix, " ").concat(message);
+        if (obj !== undefined) {
+            fullMessage += " ".concat(Logger.obj2str(obj));
+        }
+        return fullMessage;
+    };
+    ExpressLogger.prototype.info = function (message, obj) {
+        Logger.info(this.formatMessage(message, obj));
+    };
+    ExpressLogger.prototype.error = function (message, obj) {
+        Logger.error(this.formatMessage(message, obj));
+    };
+    ExpressLogger.prototype.warn = function (message, obj) {
+        Logger.warn(this.formatMessage(message, obj));
+    };
+    return ExpressLogger;
+}());
+exports.ExpressLogger = ExpressLogger;
 process.on('SIGINT', function () {
     Logger.stopWriteLogFile();
+    process.exit(0);
 });

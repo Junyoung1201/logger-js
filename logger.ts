@@ -37,7 +37,7 @@ export class Logger {
         return value.toString();
     }
 
-    private static getTimeStr(date: Date) {
+    static getTimeStr(date: Date) {
         let yyyy = date.getFullYear().toString().padEnd(4, "0")
         let mm = (date.getMonth() + 1).toString().padStart(2, "0")
         let dd = date.getDate().toString().padStart(2, "0")
@@ -118,14 +118,16 @@ export class Logger {
     }
 
     static stopWriteLogFile() {
+        if (!Logger.ws) {
+            return;
+        }
+
         Logger.s(`Stop writing log file.`);
 
-        if (Logger.ws) {
-            Logger.s(`A write stream of log files currently exists. Ends the write stream of a log file.`);
-            Logger.ws.close();
-            Logger.ws.end();
-            Logger.ws = undefined;
-        }
+        Logger.s(`A write stream of log files currently exists. Ends the write stream of a log file.`);
+        Logger.ws.close();
+        Logger.ws.end();
+        Logger.ws = undefined;
     }
 
     static pauseWriteLogFile(bool: boolean) {
@@ -165,15 +167,15 @@ export class Logger {
         }
     }
 
-    static info(message: string) {
-        Logger.log('info', message)
-    }
-
     static log(level: 'warn' | 'error' | 'info', message: string) {
         const { yyyy, mm, dd, h, m, s } = Logger.getTimeStr(new Date());
         const text = `[${yyyy}-${mm}-${dd} ${h}:${m}:${s}] [${level.toUpperCase()}] ${message}`;
         console[level](text);
         Logger.writeLogFile(text);
+    }
+
+    static info(message: string) {
+        Logger.log('info', message)
     }
 
     static warn(message: string) {
@@ -185,6 +187,41 @@ export class Logger {
     }
 }
 
+export class ExpressLogger {
+    routePrefix: string;
+    ipPrefix: string;
+
+    constructor(req: any, res: any) {
+        const method = (req.method as string).toUpperCase();
+        const route = req.baseUrl || req.path || "/";
+
+        this.routePrefix = `[${method} ${route}]`;
+        this.ipPrefix = `[IP: ${req.ip}]`;
+    }
+
+    private formatMessage(message: string, obj?: any): string {
+        let fullMessage = `${this.routePrefix} ${this.ipPrefix} ${message}`;
+        if (obj !== undefined) {
+            fullMessage += ` ${Logger.obj2str(obj)}`;
+        }
+        return fullMessage;
+    }
+
+    info(message: string, obj?: any) {
+        Logger.info(this.formatMessage(message, obj));
+    }
+
+    error(message: string, obj?: any) {
+        Logger.error(this.formatMessage(message, obj));
+    }
+
+    warn(message: string, obj?: any) {
+        Logger.warn(this.formatMessage(message, obj));
+    }
+}
+
 process.on('SIGINT', () => {
     Logger.stopWriteLogFile();
+    process.exit(0);
 })
+

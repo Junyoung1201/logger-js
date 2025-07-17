@@ -3,13 +3,18 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
+        "test:express": "cls && ts-node ./express-test",
         "test": "cls && ts-node ./test"
     },
     "author": "",
     "license": "ISC",
     "description": "",
     "devDependencies": {
+        "@types/express": "^5.0.3",
         "@types/node": "^24.0.14",
         "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "express": "^5.1.0"
     }
 }
